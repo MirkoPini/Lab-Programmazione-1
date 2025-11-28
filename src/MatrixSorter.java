@@ -24,12 +24,12 @@ public class MatrixSorter {
             num[i] = i;
         }
 
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                num = rnd.nextInt(1, 10);
-                matrix[i][j] = num;
-            }
-        }
+        //for (int i = 0; i < matrix.length; i++) {
+        //    for (int j = 0; j < matrix[i].length; j++) {
+        //        num = rnd.nextInt(1, 10);
+        //        matrix[i][j] = num;
+        //    }
+        //}
         return matrix;
     }
 
