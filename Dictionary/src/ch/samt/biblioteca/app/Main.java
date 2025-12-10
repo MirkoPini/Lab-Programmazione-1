@@ -25,13 +25,15 @@ public class Main {
 
         System.out.println("Catalogo completo:");
         ArrayList<ItemBiblioteca> catalogo = bib1.getCatalogo();
-        for (ItemBiblioteca it : catalogo) {
-            System.out.println(it);
+        for (ItemBiblioteca item : catalogo) {
+            System.out.println(item);
         }
 
         System.out.println("Libri di Mario Rossi:");
         ArrayList<ItemBiblioteca> diMario = bib1.getElementiDiAutore("Mario Rossi");
-        for (ItemBiblioteca it : diMario) System.out.println(it);
+        for (ItemBiblioteca item : diMario){
+            System.out.println(item);
+        }
 
         // Test FIFO
         System.out.println("--- Test FIFO (Prenotazioni) ---");
