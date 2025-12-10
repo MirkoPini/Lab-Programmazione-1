@@ -12,6 +12,10 @@ public class Libro extends ItemBiblioteca{
 
     @Override
     public String toString() {
-        return String.format("Libro: %s, regista: %s, durata: %d min", super.toString(), autore, numeroPagine);
+        return String.format("Libro: %s, autore: %s, numero pagine: %d pagine", super.toString(), autore, numeroPagine);
+    }
+
+    public String getAutore() {
+        return autore;
     }
 }
