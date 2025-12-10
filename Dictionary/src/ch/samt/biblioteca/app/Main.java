@@ -13,17 +13,19 @@ public class Main {
         Biblioteca bib1 = new Biblioteca();
 
         Libro l1 = new Libro("L001", "Il giovane", 2010, "A1", "Mario Rossi", 320);
+        Libro l3 = new Libro("L003", "Il giovane gay", 2011, "A104", "Mario Rossi", 67);
         Libro l2 = new Libro("L002", "La strada", 2015, "A2", "Lucia Bianchi", 210);
         Dvd d1 = new Dvd("D001", "Avventura", 2018, "D1", "Giovanni Verdi", 120);
 
         System.out.println("l1 aggiunto? " + bib1.aggiungiItem(l1));
+        System.out.println("l3 aggiunto? " + bib1.aggiungiItem(l3));
         System.out.println("l2 aggiunto? " + bib1.aggiungiItem(l2));
         System.out.println("d1 aggiunto? " + bib1.aggiungiItem(d1));
 
         Libro l1dup = new Libro("L001", "Il giovane - copia", 2010, "A1", "Mario Rossi", 320);
         System.out.println("l1dup aggiunto? " + bib1.aggiungiItem(l1dup));
 
-        System.out.println("Catalogo completo:");
+        System.out.println("Catalogo completo:\n");
         ArrayList<ItemBiblioteca> catalogo = bib1.getCatalogo();
         for (ItemBiblioteca item : catalogo) {
             System.out.println(item);
@@ -50,5 +52,8 @@ public class Main {
         bib1.aggiungiConsegnaUrgenteLIFO(d1);
         ItemBiblioteca u = bib1.prossimaConsegnaLIFO();
         System.out.println("Estratta (LIFO): " + u);
+
+
+        System.out.println(bib1.getElementiDiAutore("Mario Rossi"));
     }
 }

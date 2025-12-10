@@ -21,7 +21,9 @@ public class Biblioteca {
     }
 
     public boolean aggiungiItem(ItemBiblioteca item) {
-        if (item == null) return false;
+        if (item == null){
+            return false;
+        }
         String codice = item.getCodice();
         if (codiciUsati.contains(codice)) {
             return false;

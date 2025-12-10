@@ -12,6 +12,6 @@ public class Dvd extends ItemBiblioteca{
 
     @Override
     public String toString() {
-        return String.format("DVD: %s, regista: %s, durata: %d min", super.toString(), regista, durataMinuti);
+        return String.format("DVD\n" + super.toString() + "\nRegista: " + regista + "\nDurata: " + durataMinuti + " min\n");
     }
 }
