@@ -11,6 +11,14 @@ public class SpellCard extends Card{
         this.radius = radius;
     }
 
+    public int getAreaDamage() {
+        return areaDamage;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
     @Override
     public String toString() {
         return super.toString() +

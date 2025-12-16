@@ -33,9 +33,10 @@ public class Card {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (!(o instanceof Card)) return false;
         Card card = (Card) o;
-        return elixirCost == card.elixirCost && level == card.level && Objects.equals(name, card.name);
+        return Objects.equals(name, card.name);
     }
 
     @Override
