@@ -10,9 +10,8 @@ public class Deck {
     }
 
     public void addCard(Card card){
-        if(cards.size() < 8 && !cards.contains(card)){
+        if(cards.size() > 8) {
             cards.add(card);
-            System.out.println("Carta aggiunta!");
         }else {
             System.out.println("Deck pieno!");
         }
@@ -34,10 +33,5 @@ public class Deck {
         }else{
             System.out.println("Deck vuoto!");
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Deck{cards=" + cards + "}";
     }
 }
