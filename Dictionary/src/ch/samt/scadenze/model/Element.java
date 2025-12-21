@@ -11,6 +11,14 @@ public abstract class Element {
         this.creationDate = creationDate;
     }
 
+    public String getIdCode(){
+        return this.idCode;
+    }
+
+    public Date getCreationDate(){
+        return this.creationDate;
+    }
+
     public abstract Date dataScadenza();
 
     public boolean scaduto(Element el){
@@ -20,5 +28,11 @@ public abstract class Element {
         }else{
             return false;
         }
+    }
+
+    @Override
+    public String toString(){
+        return "Code: " + getIdCode() + "\n"
+                "Creation Date: " + getCreationDate() + "\n";
     }
 }
