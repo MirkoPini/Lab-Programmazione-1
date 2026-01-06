@@ -1,5 +1,7 @@
 package ch.samt.scadenze.model;
 
+import java.util.Date;
+
 public class Libro extends Element{
     private int durataGiorni;
 
@@ -19,6 +21,6 @@ public class Libro extends Element{
 
     @Override
     public String toString(){
-        return super(toString) + "Prestito:" + "\n" + "Durata giorni: " + getDurataGiorni() + "\n";
+        return super.toString() + "Prestito:" + "\n" + "Durata giorni: " + getDurataGiorni() + "\n";
     }
 }

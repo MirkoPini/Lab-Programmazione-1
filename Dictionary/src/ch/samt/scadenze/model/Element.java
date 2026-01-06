@@ -32,7 +32,7 @@ public abstract class Element {
 
     @Override
     public String toString(){
-        return "Code: " + getIdCode() + "\n"
+        return "Code: " + getIdCode() + "\n" +
                 "Creation Date: " + getCreationDate() + "\n";
     }
 }
