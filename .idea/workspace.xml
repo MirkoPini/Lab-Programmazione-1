@@ -14,6 +14,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -32,22 +33,41 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
+    "Downloaded.Files.Path.Enabled": "false",
+    "JUnit.DownloadableTest.executor": "Run",
+    "JUnit.LibraryResourceTest.executor": "Run",
+    "JUnit.SmartLibraryTest.executor": "Run",
+    "JUnit.SmartLibraryTest.shouldOnlyReturnDownloadableResources.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "create.test.in.the.same.root": "true",
     "last_opened_file_path": "//Cpt.local/shares/homes/allievi/SAM/IN/_folder-redir/hic866/My Documents/Java/Laboratorio Programmazione 1",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "//Cpt.local/shares/homes/allievi/SAM/IN/_folder-redir/hic866/My Documents/Java/Laboratorio Programmazione 1/Esercizi/Esercizi_10/src/Main.java",
+    "onboarding.tips.debug.path": "//Cpt.local/shares/homes/allievi/SAM/IN/_folder-redir/hic866/My Documents/Java/Laboratorio Programmazione 1/Esercizi/Esercizi 11/src/Main.java",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.JavaFX",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -64,12 +84,24 @@
       <option name="presentableId" value="Default" />
       <updated>1769782711929</updated>
       <workItem from="1769782713016" duration="238000" />
-      <workItem from="1769782971691" duration="3501000" />
+      <workItem from="1769782971691" duration="3793000" />
+      <workItem from="1770383479526" duration="5270000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Esercizi/Esercizi 11/src/Main.java</url>
+          <line>11</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
