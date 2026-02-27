@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1bc6db61-d5da-479e-9ea7-d7730e45745c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Esercizi/Esercizi_13/Esercizi_13.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/FunctionMath.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_12/Esercizi_12.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Esercizi/Esercizi_12/Esercizi_12.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_12/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/FunctionMath.java" beforeDir="false" afterPath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/FunctionMath.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +98,7 @@
       <workItem from="1770383479526" duration="5270000" />
       <workItem from="1770391036617" duration="11000" />
       <workItem from="1770984975518" duration="37000" />
-      <workItem from="1772028051075" duration="517000" />
+      <workItem from="1772028051075" duration="1319000" />
     </task>
     <servers />
   </component>
