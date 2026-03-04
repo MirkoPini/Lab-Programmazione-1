@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1bc6db61-d5da-479e-9ea7-d7730e45745c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_14/src/forme/CerchioTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Esercizi/Esercizi_14/src/forme/CerchioTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +25,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Esercizi/Esercizi_14/src/forme/CerchioTest.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Esercizi/Esercizi_14/src/forme/RettangoloTest.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -42,6 +44,7 @@
   &quot;keyToString&quot;: {
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
     &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JUnit.CerchioTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.DownloadableTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.LibraryResourceTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.RettangoloTest.executor&quot;: &quot;Run&quot;,
@@ -104,7 +107,9 @@
       <workItem from="1772028051075" duration="1319000" />
       <workItem from="1772624072481" duration="84000" />
       <workItem from="1772624166445" duration="2598000" />
-      <workItem from="1772626793426" duration="303000" />
+      <workItem from="1772626793426" duration="694000" />
+      <workItem from="1772627500616" duration="650000" />
+      <workItem from="1772628930801" duration="21000" />
     </task>
     <servers />
   </component>
