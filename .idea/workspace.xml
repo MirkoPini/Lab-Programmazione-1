@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1bc6db61-d5da-479e-9ea7-d7730e45745c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Esercizi/Esercizi_14/Esercizi_14.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/FunctionMath.java" beforeDir="false" afterPath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/FunctionMath.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Esercizi/Esercizi_13/src/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,13 +17,16 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JUnit5 Test Class" />
         <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Esercizi/Esercizi_14/src/forme/RettangoloTest.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
@@ -43,6 +46,7 @@
     "Downloaded.Files.Path.Enabled": "false",
     "JUnit.DownloadableTest.executor": "Run",
     "JUnit.LibraryResourceTest.executor": "Run",
+    "JUnit.RettangoloTest.executor": "Run",
     "JUnit.SmartLibraryTest.executor": "Run",
     "JUnit.SmartLibraryTest.shouldOnlyReturnDownloadableResources.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -62,7 +66,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "C:/DatiAllievo/MirkoPini/Lab-Programmazione-1/Esercizi/Esercizi_13/src/Main.java",
+    "onboarding.tips.debug.path": "C:/DatiAllievo/MirkoPini/Lab-Programmazione-1/Esercizi/Esercizi_14/src/Main.java",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.0",
@@ -75,6 +79,7 @@
       <recent name="" />
     </key>
     <key name="CreateTestDialog.RecentsKey">
+      <recent name="forme" />
       <recent name="" />
     </key>
   </component>
@@ -99,6 +104,8 @@
       <workItem from="1770391036617" duration="11000" />
       <workItem from="1770984975518" duration="37000" />
       <workItem from="1772028051075" duration="1319000" />
+      <workItem from="1772624072481" duration="84000" />
+      <workItem from="1772624166445" duration="2479000" />
     </task>
     <servers />
   </component>
