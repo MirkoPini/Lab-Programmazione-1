@@ -23,18 +23,19 @@ public class MainGame extends ApplicationAdapter {
     private Rectangle pipeDownBounds;
     private Rectangle pipeUpBounds;
 
-    final float GRAVITY = -700;
-    final float FLAP_FORCE = 350;
+    final float GRAVITY = -500;
+    final float FLAP_FORCE = 250;
 
     private float velY = 0;
     private float flappyY = 180;
     private float flappyX = 50;
 
     private float pipeX = 200;
-    private float pipeY = 47;
+    private float pipeDY = 47;
     private int pipeW = 52;
     private int pipeDH = 200;
-    private int pipeUH = 200;
+    private int pipeUH = 100;
+    private float pipeUY = 380;
     int minW = 20;
     int maxW = 320;
 
@@ -51,7 +52,8 @@ public class MainGame extends ApplicationAdapter {
         background = new Texture("background.png");
 
         pipe = new Texture("pipe.png");
-        pipeDownBounds = new Rectangle(pipeX, pipeY, pipeW, pipeDH);
+        pipeDownBounds = new Rectangle(pipeX, pipeDY, pipeW, pipeDH);
+        pipeUpBounds = new Rectangle(pipeX, pipeUY, pipeW, pipeUH);
 
         batch = new SpriteBatch();
 
@@ -88,6 +90,7 @@ public class MainGame extends ApplicationAdapter {
             if (pipeX + 52 <= 0) {
                 int numero = (int)(Math.random() * (maxW - minW + 1)) + minW;
                 pipeDownBounds.height = numero;
+                pipeUpBounds.height = 480 - 180 - numero;
                 pipeX = xD;
             }
 
@@ -109,7 +112,6 @@ public class MainGame extends ApplicationAdapter {
                 GameOver = true;
             }
 
-
         } else if(GameOver){
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
                 ReStartGame();
@@ -117,11 +119,14 @@ public class MainGame extends ApplicationAdapter {
         }
 
         //System.out.println(dt + " ; " + velY + " ; " + flappyY);
+        pipeUY = 480 - pipeUpBounds.height;
+        pipeUpBounds.y = pipeUY;
 
         ScreenUtils.clear(0,0,0,1);
         batch.begin();
         batch.draw(background, 0, 0);
-        batch.draw(pipe, pipeX, pipeY, pipeDownBounds.width, pipeDownBounds.height);
+        batch.draw(pipe, pipeX, pipeDY, pipeDownBounds.width, pipeDownBounds.height);
+        batch.draw(pipe, pipeX, pipeUY, pipeUpBounds.width, pipeUpBounds.height);
         batch.draw(flappyTex, flappyX, flappyY, 56, 40);
         font.draw(batch, "Vita: " + life, 20, Gdx.graphics.getHeight() - 20);
         if(GameOver){
