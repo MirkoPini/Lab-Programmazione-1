@@ -15,7 +15,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class MainGame extends ApplicationAdapter {
     private Texture flappyTex;
     private Texture background;
-    private Texture pipe;
+    private Texture pipeDown;
+    private Texture pipeUp;
     private SpriteBatch batch;
     private BitmapFont font;
     private Rectangle flappyBounds;
@@ -51,7 +52,8 @@ public class MainGame extends ApplicationAdapter {
 
         background = new Texture("background.png");
 
-        pipe = new Texture("pipe.png");
+        pipeDown = new Texture("pipeDown.png");
+        pipeUp = new Texture("pipeUp.png");
         pipeDownBounds = new Rectangle(pipeX, pipeDY, pipeW, pipeDH);
         pipeUpBounds = new Rectangle(pipeX, pipeUY, pipeW, pipeUH);
 
@@ -125,8 +127,8 @@ public class MainGame extends ApplicationAdapter {
         ScreenUtils.clear(0,0,0,1);
         batch.begin();
         batch.draw(background, 0, 0);
-        batch.draw(pipe, pipeX, pipeDY, pipeDownBounds.width, pipeDownBounds.height);
-        batch.draw(pipe, pipeX, pipeUY, pipeUpBounds.width, pipeUpBounds.height);
+        batch.draw(pipeDown, pipeX, pipeDY, pipeDownBounds.width, pipeDownBounds.height);
+        batch.draw(pipeUp, pipeX, pipeUY, pipeUpBounds.width, pipeUpBounds.height);
         batch.draw(flappyTex, flappyX, flappyY, 56, 40);
         font.draw(batch, "Vita: " + life, 20, Gdx.graphics.getHeight() - 20);
         if(GameOver){
@@ -140,7 +142,8 @@ public class MainGame extends ApplicationAdapter {
         batch.dispose();
         flappyTex.dispose();
         background.dispose();
-        pipe.dispose();
+        pipeDown.dispose();
+        pipeUp.dispose();
         font.dispose();
     }
 
