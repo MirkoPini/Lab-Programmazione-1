@@ -28,7 +28,7 @@ public class MainGame extends ApplicationAdapter {
     final float FLAP_FORCE = 250;
 
     private float velY = 0;
-    private float flappyY = 180;
+    private float flappyY = 200;
     private float flappyX = 50;
 
     private float pipeX = 200;
@@ -96,18 +96,12 @@ public class MainGame extends ApplicationAdapter {
                 pipeX = xD;
             }
 
-            flappyBounds.y = flappyY;
-            pipeDownBounds.x = pipeX;
-
-            if (flappyBounds.overlaps(groundBounds)) {
+            if(flappyBounds.overlaps(pipeDownBounds) || flappyBounds.overlaps(pipeUpBounds) || flappyBounds.overlaps(groundBounds)){
                 life -= 1;
                 flappyY = 180;
                 flappyX = 50;
                 velY = 0;
-            }
-
-            if(flappyBounds.overlaps(pipeDownBounds) || flappyBounds.overlaps(pipeUpBounds)){
-                GameOver = true;
+                pipeX = 200;
             }
 
             if(life <= 0){
@@ -123,6 +117,9 @@ public class MainGame extends ApplicationAdapter {
         //System.out.println(dt + " ; " + velY + " ; " + flappyY);
         pipeUY = 480 - pipeUpBounds.height;
         pipeUpBounds.y = pipeUY;
+        flappyBounds.y = flappyY;
+        pipeDownBounds.x = pipeX;
+        pipeUpBounds.x = pipeX;
 
         ScreenUtils.clear(0,0,0,1);
         batch.begin();
