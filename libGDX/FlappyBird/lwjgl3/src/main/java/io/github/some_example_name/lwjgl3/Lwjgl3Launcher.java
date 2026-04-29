@@ -34,7 +34,7 @@ public class Lwjgl3Launcher {
         int monitorWidth = mode.width;
         int monitorHeight = mode.height - 100;*/
 
-        configuration.setWindowedMode(280, 480);
+        configuration.setWindowedMode(350, 550);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");

@@ -3,6 +3,8 @@ package io.github.some_example_name;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -24,6 +26,11 @@ public class MainGame extends ApplicationAdapter {
     private Rectangle pipeDownBounds;
     private Rectangle pipeUpBounds;
 
+    private Sound jumpSound;
+    private Sound fallSound;
+    private Sound gameoverSound;
+    private Music bgMusic;
+
     final float GRAVITY = -500;
     final float FLAP_FORCE = 250;
 
@@ -34,11 +41,11 @@ public class MainGame extends ApplicationAdapter {
     private float pipeX = 200;
     private float pipeDY = 47;
     private int pipeW = 52;
-    private int pipeDH = 200;
-    private int pipeUH = 100;
-    private float pipeUY = 380;
-    int minW = 20;
-    int maxW = 320;
+    private int pipeDH = 180;
+    private int pipeUH = 180;
+    private float pipeUY = 450;
+    private int minW = 20;
+    private int maxW = 350;
 
     private int life = 3;
     private boolean GameOver = false;
@@ -62,6 +69,13 @@ public class MainGame extends ApplicationAdapter {
         font = new BitmapFont();
         font.setColor(Color.YELLOW);
         font.getData().setScale(1.2f);
+
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.mp3"));
+        fallSound = Gdx.audio.newSound(Gdx.files.internal("sfx/fall.wav"));
+        gameoverSound = Gdx.audio.newSound(Gdx.files.internal("sfx/gameover.mp3"));
+        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("music/theme.mp3"));
+        bgMusic.setVolume(0.5f);
+        bgMusic.play();
     }
 
     @Override
@@ -73,6 +87,7 @@ public class MainGame extends ApplicationAdapter {
         if(!GameOver) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.justTouched()) {
                 velY = FLAP_FORCE;
+                long jumpId = jumpSound.play();
             }
             velY += GRAVITY * dt;
 
@@ -88,11 +103,12 @@ public class MainGame extends ApplicationAdapter {
                 velY = -velY;
             }
 
-            pipeX -= 2;
+            pipeX -= 2.5
+            ;
             if (pipeX + 52 <= 0) {
                 int numero = (int)(Math.random() * (maxW - minW + 1)) + minW;
                 pipeDownBounds.height = numero;
-                pipeUpBounds.height = 480 - 180 - numero;
+                pipeUpBounds.height = 550 - 180 - numero;
                 pipeX = xD;
             }
 
@@ -102,20 +118,19 @@ public class MainGame extends ApplicationAdapter {
                 flappyX = 50;
                 velY = 0;
                 pipeX = 200;
+                long fallId = fallSound.play();
             }
 
             if(life <= 0){
                 GameOver = true;
+                long gameoverId = gameoverSound.play();
+                bgMusic.pause();
             }
 
-        } else if(GameOver){
-            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                ReStartGame();
-            }
         }
 
         //System.out.println(dt + " ; " + velY + " ; " + flappyY);
-        pipeUY = 480 - pipeUpBounds.height;
+        pipeUY = 550 - pipeUpBounds.height;
         pipeUpBounds.y = pipeUY;
         flappyBounds.y = flappyY;
         pipeDownBounds.x = pipeX;
@@ -123,13 +138,16 @@ public class MainGame extends ApplicationAdapter {
 
         ScreenUtils.clear(0,0,0,1);
         batch.begin();
-        batch.draw(background, 0, 0);
+        batch.draw(background, 0, 0, 350, 550);
         batch.draw(pipeDown, pipeX, pipeDY, pipeDownBounds.width, pipeDownBounds.height);
         batch.draw(pipeUp, pipeX, pipeUY, pipeUpBounds.width, pipeUpBounds.height);
         batch.draw(flappyTex, flappyX, flappyY, 56, 40);
         font.draw(batch, "Vita: " + life, 20, Gdx.graphics.getHeight() - 20);
         if(GameOver){
             font.draw(batch, "GameOver", Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                ReStartGame();
+            }
         }
         batch.end();
     }
@@ -142,6 +160,9 @@ public class MainGame extends ApplicationAdapter {
         pipeDown.dispose();
         pipeUp.dispose();
         font.dispose();
+        jumpSound.dispose();
+        fallSound.dispose();
+        bgMusic.dispose();
     }
 
     private void ReStartGame(){
@@ -152,5 +173,6 @@ public class MainGame extends ApplicationAdapter {
         flappyBounds.y = flappyY;
         velY = 0;
         GameOver = false;
+        bgMusic.play();
     }
 }
