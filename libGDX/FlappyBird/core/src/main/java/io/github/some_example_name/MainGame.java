@@ -48,6 +48,7 @@ public class MainGame extends ApplicationAdapter {
     private int maxW = 350;
 
     private int life = 3;
+    private int point = 0;
     private boolean GameOver = false;
 
     @Override
@@ -103,13 +104,14 @@ public class MainGame extends ApplicationAdapter {
                 velY = -velY;
             }
 
-            pipeX -= 2.5
-            ;
+            pipeX -= 2.5 + point/5;
+
             if (pipeX + 52 <= 0) {
                 int numero = (int)(Math.random() * (maxW - minW + 1)) + minW;
                 pipeDownBounds.height = numero;
                 pipeUpBounds.height = 550 - 180 - numero;
                 pipeX = xD;
+                point += 1;
             }
 
             if(flappyBounds.overlaps(pipeDownBounds) || flappyBounds.overlaps(pipeUpBounds) || flappyBounds.overlaps(groundBounds)){
@@ -125,6 +127,7 @@ public class MainGame extends ApplicationAdapter {
                 GameOver = true;
                 long gameoverId = gameoverSound.play();
                 bgMusic.pause();
+                resetPipes();
             }
 
         }
@@ -143,6 +146,7 @@ public class MainGame extends ApplicationAdapter {
         batch.draw(pipeUp, pipeX, pipeUY, pipeUpBounds.width, pipeUpBounds.height);
         batch.draw(flappyTex, flappyX, flappyY, 56, 40);
         font.draw(batch, "Vita: " + life, 20, Gdx.graphics.getHeight() - 20);
+        font.draw(batch, "Punti: " + point, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 20);
         if(GameOver){
             font.draw(batch, "GameOver", Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -168,11 +172,17 @@ public class MainGame extends ApplicationAdapter {
     private void ReStartGame(){
         flappyY = 180;
         flappyX = 50;
-        pipeX = 200;
         life = 3;
+        point = 0;
         flappyBounds.y = flappyY;
         velY = 0;
         GameOver = false;
         bgMusic.play();
+    }
+
+    private void resetPipes(){
+        pipeX = 200;
+        pipeDownBounds.height = 180;
+        pipeUpBounds.height = 180;
     }
 }
