@@ -6,7 +6,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.Random;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class MainGame extends ApplicationAdapter {
@@ -31,18 +34,28 @@ public class MainGame extends ApplicationAdapter {
 
     private Rectangle playerBounds;
 
-    private float playerX = 50;
     private float playerY = 205;
     private float playerSizeX = 160;
     private float playerSizeY = 185;
 
+    //Salto
+    private float velY;
+    final float GRAVITY = -2000;
+    final float JUMP_FORCE = 900;
+
     private boolean movimentoAvanti = false;
     private boolean movimentoIndietro = false;
-    private int movimentoSprite = 0;
+    private float movimentoSprite = 0;
 
     private float vita = 3;
 
+    //Ostacoli
+    private Texture obstacleTexture;
 
+    private Array<Obstacle> obstacles = new Array<>();
+    private float spawnTimer = 0;
+    private float spawnInterval = 2.5f;
+    private Random random = new Random();
 
 
     @Override
@@ -59,7 +72,9 @@ public class MainGame extends ApplicationAdapter {
         playerIndietro1 = new Texture("playerIndietro1.png");
         playerIndietro2 = new Texture("playerIndietro2.png");
 
-        playerBounds = new Rectangle(playerX, playerY, playerSizeX, playerSizeY);
+        playerBounds = new Rectangle((Gdx.graphics.getWidth() / 2 - 160), playerY, playerSizeX, playerSizeY);
+
+        obstacleTexture = new Texture("libgdx.png");
     }
 
     @Override
@@ -72,14 +87,18 @@ public class MainGame extends ApplicationAdapter {
         //Logica del gioco
         movimentoAvanti = false;
         movimentoIndietro = false;
-        movimentoSprite += 1;
-        playerBounds.x = xD / 2 - 160;
+        movimentoSprite += 10 * dt;
 
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
             movimentoAvanti = true;
             movimentoIndietro = false;
-            bgX1 -= vel * dt;
-            bgX2 -= vel * dt;
+            if(playerBounds.x >= (xD / 2 - 160)) {
+                playerBounds.x = xD / 2 - 160;
+                bgX1 -= vel * dt;
+                bgX2 -= vel * dt;
+            }else {
+                playerBounds.x += vel * dt;
+            }
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)){
@@ -88,13 +107,49 @@ public class MainGame extends ApplicationAdapter {
             playerBounds.x -= vel * dt;
         }
 
+        //Logica Salto
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            velY = JUMP_FORCE;
+        }
 
+        velY += GRAVITY * dt;
+
+        playerBounds.y += velY * dt;
+
+        //Movimento background
         if (bgX1 + background.getWidth() < 0) {
             bgX1 = bgX2 + background.getWidth();
         }
 
         if (bgX2 + background.getWidth() < 0) {
             bgX2 = bgX1 + background.getWidth();
+        }
+
+        //Blocca uscita dallo schermo
+        if(playerBounds.x <= 0){
+            playerBounds.x = 0;
+            movimentoIndietro = false;
+        }
+
+        if(playerBounds.x >= xD - 160){
+            playerBounds.x = xD - 160;
+            movimentoAvanti = false;
+        }
+
+        if(playerBounds.y < 205){
+            playerBounds.y = 205;
+        }
+
+        //Logica Ostacoli
+
+        spawnTimer += dt;
+        if (spawnTimer >= spawnInterval) {
+            spawnTimer = 0;
+            spawnInterval = 1.5f + random.nextFloat() * 2f;
+
+            float obstacleH = 50 + random.nextInt(100);
+            float obstacleY = 205;
+            obstacles.add(new Obstacle(obstacleTexture, xD + 50, obstacleY, 60, obstacleH));
         }
 
         //Disegna gli sprite
@@ -108,26 +163,47 @@ public class MainGame extends ApplicationAdapter {
             batch.draw(player, playerBounds.x, playerBounds.y);
             movimentoSprite = 0;
         } else if(movimentoAvanti){
-            if(movimentoSprite <= 10){
+            if(movimentoSprite <= 1){
                 batch.draw(playerMovimento1, playerBounds.x, playerBounds.y);
-            } else if((movimentoSprite > 10 && movimentoSprite <= 20) || (movimentoSprite > 30 && movimentoSprite <= 40)){
+            } else if((movimentoSprite > 1 && movimentoSprite <= 2) || (movimentoSprite > 3 && movimentoSprite <= 4)){
                 batch.draw(player, playerBounds.x, playerBounds.y);
-            } else if(movimentoSprite > 20 && movimentoSprite <= 30){
+            } else if(movimentoSprite > 2 && movimentoSprite <= 3){
                 batch.draw(playerMovimento2, playerBounds.x, playerBounds.y);
             } else {
                 movimentoSprite = 0;
                 batch.draw(player, playerBounds.x, playerBounds.y);
             }
         } else if(movimentoIndietro){
-            if(movimentoSprite <= 10){
+            if(movimentoSprite <= 1){
                 batch.draw(playerIndietro1, playerBounds.x, playerBounds.y);
-            } else if((movimentoSprite > 10 && movimentoSprite <= 20) || (movimentoSprite > 30 && movimentoSprite <= 40)){
+            } else if((movimentoSprite > 1 && movimentoSprite <= 2) || (movimentoSprite > 3 && movimentoSprite <= 4)){
                 batch.draw(playerIndietro, playerBounds.x, playerBounds.y);
-            } else if(movimentoSprite > 20 && movimentoSprite <= 30){
+            } else if(movimentoSprite > 2 && movimentoSprite <= 3){
                 batch.draw(playerIndietro2, playerBounds.x, playerBounds.y);
             } else {
                 movimentoSprite = 0;
                 batch.draw(playerIndietro, playerBounds.x, playerBounds.y);
+            }
+        }
+
+        for (int i = obstacles.size - 1; i >= 0; i--) {
+            Obstacle obs = obstacles.get(i);
+            if(movimentoAvanti) {
+                obs.bounds.x -= vel * dt;
+            }
+
+            if (obs.bounds.x + obs.bounds.width < 0) {
+                obstacles.removeIndex(i);
+                continue;
+            }
+
+            batch.draw(obs.texture, obs.bounds.x, obs.bounds.y,
+                obs.bounds.width, obs.bounds.height);
+
+
+            if (obs.bounds.overlaps(playerBounds)) {
+                vita--;
+                obstacles.removeIndex(i);
             }
         }
 
