@@ -42,6 +42,7 @@ public class MainGame extends ApplicationAdapter {
     private float velY;
     final float GRAVITY = -2000;
     final float JUMP_FORCE = 900;
+    private float pavimento = 205;
 
     private boolean movimentoAvanti = false;
     private boolean movimentoIndietro = false;
@@ -50,11 +51,14 @@ public class MainGame extends ApplicationAdapter {
     private float vita = 3;
 
     //Ostacoli
-    private Texture obstacleTexture;
+    private Texture cassa;
+    private Texture lava;
+    private Texture muro;
+    private Texture terra;
+    private Texture spike;
 
     private Array<Obstacle> obstacles = new Array<>();
-    private float spawnTimer = 0;
-    private float spawnInterval = 2.5f;
+    private boolean spawnObstacle = true;
     private Random random = new Random();
 
 
@@ -74,7 +78,12 @@ public class MainGame extends ApplicationAdapter {
 
         playerBounds = new Rectangle((Gdx.graphics.getWidth() / 2 - 160), playerY, playerSizeX, playerSizeY);
 
-        obstacleTexture = new Texture("libgdx.png");
+        //Sprite degli ostacoli
+        cassa = new Texture("ostacoli/cassa.png");
+        lava = new Texture("ostacoli/lava.png");
+        muro = new Texture("ostacoli/muro.png");
+        terra = new Texture("ostacoli/terra.png");
+        spike = new Texture("ostacoli/spike.png");
     }
 
     @Override
@@ -123,6 +132,7 @@ public class MainGame extends ApplicationAdapter {
 
         if (bgX2 + background.getWidth() < 0) {
             bgX2 = bgX1 + background.getWidth();
+            spawnObstacle = true;
         }
 
         //Blocca uscita dallo schermo
@@ -136,21 +146,19 @@ public class MainGame extends ApplicationAdapter {
             movimentoAvanti = false;
         }
 
-        if(playerBounds.y < 205){
-            playerBounds.y = 205;
+        if(playerBounds.y < pavimento){
+            playerBounds.y = pavimento;
+            velY = 0;
         }
 
         //Logica Ostacoli
 
-        spawnTimer += dt;
-        if (spawnTimer >= spawnInterval) {
-            spawnTimer = 0;
-            spawnInterval = 1.5f + random.nextFloat() * 2f;
-
+        if (spawnObstacle) {
             float obstacleH = 50 + random.nextInt(100);
             float obstacleY = 205;
-            obstacles.add(new Obstacle(obstacleTexture, xD + 50, obstacleY, 60, obstacleH));
+            obstacles.add(new Obstacle(xD + 50));
         }
+
 
         //Disegna gli sprite
         batch.begin();
@@ -188,25 +196,74 @@ public class MainGame extends ApplicationAdapter {
 
         for (int i = obstacles.size - 1; i >= 0; i--) {
             Obstacle obs = obstacles.get(i);
-            if(movimentoAvanti) {
-                obs.bounds.x -= vel * dt;
+
+            obs.popolaOstacolo();
+            int[] elementi = obs.getComposizione();
+
+            if(movimentoAvanti && playerBounds.x >= (xD / 2 - 160)) {
+                obs.startX -= vel * dt;
             }
 
-            if (obs.bounds.x + obs.bounds.width < 0) {
-                obstacles.removeIndex(i);
-                continue;
+            float xElemento = obs.startX;
+            for (int j = 0; j < elementi.length; j++) {
+                if(elementi[j] == obs.getCassa()){
+                    batch.draw(cassa, xElemento, obs.startY, 138, 120);
+                    xElemento += 138;
+
+                    if(collisione(player, playerBounds.x, playerBounds.y, cassa, xElemento, obs.startY)){
+                        pavimento = 324;
+                    } else{
+                        pavimento = 205;
+                    }
+
+                } else if(elementi[j] == obs.getLava()) {
+                    batch.draw(lava, xElemento, obs.startY, 187, 120);
+                    xElemento += 187;
+
+                    if (collisione(player, playerBounds.x, playerBounds.y, lava, xElemento, obs.startY)) {
+                        pavimento = 324;
+                    } else {
+                        pavimento = 205;
+                    }
+
+                } else if(elementi[j] == obs.getMuro()){
+                    batch.draw(muro, xElemento, obs.startY, muro.getWidth(), muro.getHeight());
+                    xElemento += muro.getWidth();
+
+                    if (collisione(player, playerBounds.x, playerBounds.y, muro, xElemento, obs.startY)) {
+                        pavimento = 324;
+                    } else {
+                        pavimento = 205;
+                    }
+
+                } else if(elementi[j] == obs.getTerra()){
+                    batch.draw(terra, xElemento, obs.startY, terra.getWidth(), terra.getHeight());
+                    xElemento += terra.getWidth();
+
+                    if (collisione(player, playerBounds.x, playerBounds.y, terra, xElemento, obs.startY)) {
+                        pavimento = 324;
+                    } else {
+                        pavimento = 205;
+                    }
+
+                } else if(elementi[j] == obs.getSpike()){
+                    batch.draw(spike, xElemento, obs.startY, spike.getWidth(), spike.getHeight());
+                    xElemento += spike.getWidth();
+
+                    if (collisione(player, playerBounds.x, playerBounds.y, spike, xElemento, obs.startY)) {
+                        pavimento = 324;
+                    } else {
+                        pavimento = 205;
+                    }
+                }
             }
 
-            batch.draw(obs.texture, obs.bounds.x, obs.bounds.y,
-                obs.bounds.width, obs.bounds.height);
-
-
-            if (obs.bounds.overlaps(playerBounds)) {
-                vita--;
+            if (obs.startX < 0 - xElemento + obs.startX) {
                 obstacles.removeIndex(i);
             }
         }
 
+        spawnObstacle = false;
         batch.end();
     }
 
@@ -220,5 +277,15 @@ public class MainGame extends ApplicationAdapter {
         playerIndietro.dispose();
         playerIndietro1.dispose();
         playerIndietro2.dispose();
+        cassa.dispose();
+        lava.dispose();
+        muro.dispose();
+        spike.dispose();
+        terra.dispose();
+    }
+
+    public boolean collisione( Texture t1, float x1, float y1, Texture t2, float x2, float y2) {
+
+        return x1 < x2 + t2.getWidth() && x1 + t1.getWidth() > x2 && y1 < y2 + t2.getHeight() && y1 + t1.getHeight() > y2;
     }
 }
