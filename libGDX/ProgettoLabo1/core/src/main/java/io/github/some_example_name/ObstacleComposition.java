@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 abstract class ObstacleComposition {
     private int[] composizione;
+    private float[] altezzaOstacoli;
 
     //Ostacoli
     final int cassa = 1;
@@ -13,7 +14,8 @@ abstract class ObstacleComposition {
     final int terra = 5;
 
     public ObstacleComposition(){
-        composizione = new int[7];
+        composizione = new int[15];
+        altezzaOstacoli = new float[15];
     }
 
     public int[] getComposizione() {
@@ -22,6 +24,14 @@ abstract class ObstacleComposition {
 
     public void setComposizione(int elemento, int index) {
         composizione[index] = elemento;
+    }
+
+    public float[] getAltezzaOstacoli() {
+        return altezzaOstacoli;
+    }
+
+    public void setAltezzaOstacoli(float elemento, int index) {
+        altezzaOstacoli[index] = elemento;
     }
 
     public int getCassa() {
@@ -45,4 +55,6 @@ abstract class ObstacleComposition {
     }
 
     abstract void popolaOstacolo();
+
+    abstract void popolaAltezzaOstacoli();
 }
