@@ -14,8 +14,8 @@ abstract class ObstacleComposition {
     final int terra = 5;
 
     public ObstacleComposition(){
-        composizione = new int[15];
-        altezzaOstacoli = new float[15];
+        composizione = new int[12];
+        altezzaOstacoli = new float[12];
     }
 
     public int[] getComposizione() {

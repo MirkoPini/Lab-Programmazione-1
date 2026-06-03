@@ -13,34 +13,32 @@ public class Obstacle extends ObstacleComposition{
 
     @Override
     public void popolaOstacolo() {
-        if(getComposizione()[0] < 1) {
+        if (getComposizione()[0] < 1) {
+            Random random = new Random();
+            int lunghezza = getComposizione().length;
 
-            int ultimoNumero = 0;
-            boolean terzoNumero = false;
-
-            for (int i = 0; i < getComposizione().length; i++) {
-                Random random = new Random();
-
-                int min = 1;
-                int max = 5;
-
-                int numero = random.nextInt(max - min + 1) + min;
-
-                if(numero == ultimoNumero && terzoNumero) {
-                    numero += 1;
-                    terzoNumero = false;
-                    setComposizione(numero, i);
-                }else if(numero == ultimoNumero){
-                    terzoNumero = true;
-                } else{
-                    setComposizione(numero, i);
-                }
-
-                System.out.println(numero);
-                ultimoNumero = numero;
-            }
             setComposizione(3, 0);
-            setComposizione(3, 6);
+            setComposizione(3, lunghezza - 1);
+
+            for (int i = 1; i < lunghezza - 1; i++) {
+                int numeroPrecedente = getComposizione()[i - 1];
+                int numero;
+                int tentativi = 0;
+
+                do {
+                    int min = 1;
+                    int max = 5;
+                    numero = random.nextInt(max - min + 1) + min;
+                    tentativi++;
+
+                    if (tentativi > 100) break;
+
+                } while (
+                    numero == numeroPrecedente ||
+                        ((numeroPrecedente == 2 || numeroPrecedente == 4) && (numero == 2 || numero == 4))
+                );
+                setComposizione(numero, i);
+            }
         }
     }
 

@@ -20,7 +20,7 @@ public class MainGame extends ApplicationAdapter {
     private Texture background;
     private float bgX1 = 0;
     private float bgX2 = 1200;
-    private float vel = 200;
+    private float vel = 500;
 
     // Setup del player
     private Texture player;
@@ -56,6 +56,7 @@ public class MainGame extends ApplicationAdapter {
     private Texture muro;
     private Texture terra;
     private Texture spike;
+    private Texture checkpoint;
 
     private Array<Obstacle> obstacles = new Array<>();
 
@@ -86,6 +87,7 @@ public class MainGame extends ApplicationAdapter {
         muro = new Texture("ostacoli/muro.png");
         terra = new Texture("ostacoli/terra.png");
         spike = new Texture("ostacoli/spike.png");
+        checkpoint = new Texture("ostacoli/checkpoint.png");
     }
 
     @Override
@@ -135,8 +137,10 @@ public class MainGame extends ApplicationAdapter {
             playerBounds.x -= vel * dt;
         }
 
+        System.out.println(velY);
+
         // Logica salto
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && velY > -50 && velY < 50) {
             velY = JUMP_FORCE;
         }
 
@@ -151,7 +155,7 @@ public class MainGame extends ApplicationAdapter {
         if (bgX2 + background.getWidth() < 0) {
 
             bgX2 = bgX1 + background.getWidth();
-            spawnObstacle = true;
+            //spawnObstacle = true;
         }
 
         // Blocca uscita dallo schermo
@@ -180,6 +184,7 @@ public class MainGame extends ApplicationAdapter {
             float obstacleY = 205;
 
             obstacles.add(new Obstacle(xD + 50));
+            spawnObstacle = false;
         }
 
         // Disegna gli sprite
@@ -311,16 +316,21 @@ public class MainGame extends ApplicationAdapter {
                 xElemento += elemW;
             }
 
+            batch.draw(checkpoint, xElemento, obs.startY);
+
             if (!sopraElemento) {
                 pavimento = 205;
+            }
+
+            if(obs.startX < -1400 && obstacles.size < 2){
+                spawnObstacle = true;
             }
 
             if (obs.startX < -2100) {
                 obstacles.removeIndex(i);
             }
-        }
 
-        spawnObstacle = false;
+        }
 
         batch.end();
     }
