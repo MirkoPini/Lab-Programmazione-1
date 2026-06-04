@@ -2,10 +2,10 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.List;
@@ -14,290 +14,236 @@ public class MainGame extends ApplicationAdapter {
 
     private SpriteBatch batch;
 
-    // Background
+    // Background terreno (scorre in loop orizzontale e verticale)
     private Texture background;
-    private float bgX1 = 0;
-    private float bgX2 = 1200;
-    private final float vel = 500;
+    private float bgX1, bgX2;
 
-    // Player
-    private Texture player;
-    private Texture playerMovimento1;
-    private Texture playerMovimento2;
-    private Texture playerIndietro;
-    private Texture playerIndietro1;
-    private Texture playerIndietro2;
+    private BitmapFont font;
 
-    private Rectangle playerBounds;
+    // Background cielo: appare sopra il terreno quando la camera sale
+    private Texture backgroundSky;
+    private float skyBgX1, skyBgX2;
 
-    private final float playerSizeX = 160;
-    private final float playerSizeY = 185;
-
-    // Salto
-    private float velY;
-    final float GRAVITY    = -2000;
-    final float JUMP_FORCE = 900;
-
-    // Pavimento dinamico: sale quando il player è sopra un tile
-    private float pavimento = WorldLoader.BASE_Y;
-
-    private boolean movimentoAvanti   = false;
-    private boolean movimentoIndietro = false;
-    private float movimentoSprite     = 0;
-    private float vita                = 3;
+    // Camera: coordinate MONDO dell'angolo in basso a sinistra della viewport.
+    // screen = world - camera
+    private float cameraX = 0f;
+    private float cameraY = 0f;
 
     // Texture ostacoli
-    private Texture cassa;
-    private Texture lava;
-    private Texture muro;
-    private Texture terra;
-    private Texture spike;
+    private Texture cassa, lava, muro, terra, spike, coin;
 
-    // ---- MONDO DA FILE ----
+    // Mondo caricato da file
     private WorldLoader worldLoader;
+    private List<WorldLoader.Ostacolo> worldTiles;
 
-    /**
-     * Offset di scorrimento del mondo: quando il player cammina a destra,
-     * worldOffsetX aumenta, spostando tutti i tile verso sinistra.
-     */
-    private float worldOffsetX = 0f;
+    // Player
+    private Player player;
 
-    /** Lista statica dei tile non-aria caricati dal file. */
-    private List<WorldLoader.WorldTile> worldTiles;
+    private int monete;
+    private int vita = 3;
+
+    private float timer = 0f;
 
     @Override
     public void create() {
-
         batch = new SpriteBatch();
 
-        background = new Texture("background.jpg");
+        background    = new Texture("background.jpg");
+        backgroundSky = new Texture("background_sky.png");
 
-        player         = new Texture("player.png");
-        playerMovimento1 = new Texture("playerMovimento1.png");
-        playerMovimento2 = new Texture("playerMovimento2.png");
-        playerIndietro  = new Texture("playerIndietro.png");
-        playerIndietro1 = new Texture("playerIndietro1.png");
-        playerIndietro2 = new Texture("playerIndietro2.png");
+        bgX1    = 0f;
+        bgX2    = background.getWidth();
+        skyBgX1 = 0f;
+        skyBgX2 = backgroundSky.getWidth();
 
-        cassa     = new Texture("ostacoli/cassa.png");
-        lava      = new Texture("ostacoli/lava.png");
-        muro      = new Texture("ostacoli/muro.png");
-        terra     = new Texture("ostacoli/terra.png");
-        spike     = new Texture("ostacoli/spike.png");
+        cassa = new Texture("ostacoli/cassa.png");
+        lava  = new Texture("ostacoli/lava.png");
+        muro  = new Texture("ostacoli/muro.png");
+        terra = new Texture("ostacoli/terra.png");
+        spike = new Texture("ostacoli/spike.png");
+        coin = new Texture("ostacoli/coin.png");
 
-        // Carica il mondo dal file txt (metti world.txt nella cartella assets)
         worldLoader = new WorldLoader("world.txt");
-        worldTiles  = worldLoader.getTileNonAria();
+        worldTiles  = worldLoader.getOstacoloNonAria();
 
+        // Player parte al centro schermo (posizione mondo = posizione schermo quando cameraX=0)
         float xD = Gdx.graphics.getWidth();
-        playerBounds = new Rectangle(xD / 2f - playerSizeX, WorldLoader.BASE_Y, playerSizeX, playerSizeY);
+        player = new Player(0f, WorldLoader.PAVIMENTO);
+        player.texturePlayer();
+
+        font = new BitmapFont();
+        font.setColor(Color.YELLOW);
+        font.getData().setScale(3f);
     }
 
     @Override
     public void render() {
-
         ScreenUtils.clear(0, 0, 0, 1);
 
         float xD = Gdx.graphics.getWidth();
+        float yD = Gdx.graphics.getHeight();
         float dt = Gdx.graphics.getDeltaTime();
 
-        // ------- INPUT -------
-        movimentoAvanti   = false;
-        movimentoIndietro = false;
-        movimentoSprite  += 10 * dt;
+        // ── AGGIORNAMENTO PLAYER (input + fisica) ─────────────────────
+        player.movimento(dt);
 
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            movimentoAvanti   = true;
-            movimentoIndietro = false;
+        timer += dt;
 
-            if (playerBounds.x >= xD / 2f - playerSizeX) {
-                // Player fermo al centro: scorri il mondo
-                playerBounds.x = xD / 2f - playerSizeX;
-                worldOffsetX  += vel * dt;
-
-                // Scorri anche il background
-                bgX1 -= vel * dt;
-                bgX2 -= vel * dt;
-            } else {
-                playerBounds.x += vel * dt;
-            }
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            movimentoAvanti   = false;
-            movimentoIndietro = true;
-
-            // Muovi il player (e il mondo) indietro solo se c'è spazio
-            if (worldOffsetX > 0) {
-                worldOffsetX -= vel * dt;
-                bgX1 += vel * dt;
-                bgX2 += vel * dt;
-            } else {
-                playerBounds.x -= vel * dt;
-            }
-        }
-
-        // ------- SALTO -------
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && velY > -50 && velY < 50) {
-            velY = JUMP_FORCE;
-        }
-
-        velY += GRAVITY * dt;
-        playerBounds.y += velY * dt;
-
-        // ------- BACKGROUND LOOP -------
-        if (bgX1 + background.getWidth() < 0) bgX1 = bgX2 + background.getWidth();
-        if (bgX2 + background.getWidth() < 0) bgX2 = bgX1 + background.getWidth();
-
-        // ------- LIMITI SCHERMO -------
-        if (playerBounds.x <= 0) {
-            playerBounds.x    = 0;
-            movimentoIndietro = false;
-        }
-        if (playerBounds.x >= xD - playerSizeX) {
-            playerBounds.x  = xD - playerSizeX;
-            movimentoAvanti = false;
-        }
-
-        // ------- COLLISIONI CON I TILE -------
-        // Prima applica la gravità, poi correggi la posizione
+        // ── COLLISIONI CON I TILE IN COORDINATE MONDO ─────────────────
+        float worldPavimento  = WorldLoader.PAVIMENTO;
         boolean sopraQualcosa = false;
-        float nuovoPavimento  = WorldLoader.BASE_Y;
 
-        for (WorldLoader.WorldTile tile : worldTiles) {
-            // Posizione sullo schermo del tile (dipende dall'offset del mondo)
-            float screenX = tile.worldX - worldOffsetX;
-            float screenY = tile.worldY;
+        for (WorldLoader.Ostacolo tile : worldTiles) {
+            if (!collisione(player.playerX, player.playerY, Player.WIDTH, Player.HEIGHT, tile.worldX,  tile.worldY,   tile.width,   tile.height)) continue;
 
-            // Culling: salta tile fuori schermo
-            if (screenX + tile.width < 0 || screenX > xD) continue;
+            float tileTop    = tile.worldY + tile.height;
+            float tileRight  = tile.worldX + tile.width;
 
-            if (collisione(playerBounds.x, playerBounds.y, playerSizeX, playerSizeY,
-                           screenX, screenY, tile.width, tile.height)) {
+            // Calcola l'overlap su ogni lato
+            float overlapTop    = tileTop                       - player.playerY;          // player entra dal basso
+            float overlapBottom = (player.playerY + Player.HEIGHT) - tile.worldY;          // player scende dall'alto
+            float overlapLeft   = tileRight                     - player.playerX;          // player viene da destra
+            float overlapRight  = (player.playerX + Player.WIDTH) - tile.worldX;          // player viene da sinistra
 
-                float playerBottom = playerBounds.y;
-                float tileTop      = screenY + tile.height;
+            float minOverlapY = Math.min(overlapTop, overlapBottom);
+            float minOverlapX = Math.min(overlapLeft, overlapRight);
 
-                // Overlap orizzontale
-                float overlapX = Math.min(
-                    (playerBounds.x + playerSizeX) - screenX,
-                    (screenX + tile.width) - playerBounds.x
-                );
+            if(tile.tipo == WorldLoader.COIN){
+                tile.worldX = -9999f;
+                tile.worldY = -9999f;
+                monete += 1;
+                continue;
+            }
 
-                // Il player atterra sopra il tile se viene da sopra
-                // e l'overlap verticale è piccolo (bordo superiore del tile)
-                if (velY <= 0 && playerBottom <= tileTop && playerBottom >= tileTop - 30) {
+            if (minOverlapY < minOverlapX) {
+                // ── Collisione verticale ──────────────────────────────
+                if (overlapTop < overlapBottom) {
+                    // Player atterra sopra il tile (cade dall'alto)
                     sopraQualcosa = true;
-                    if (tileTop > nuovoPavimento) {
-                        nuovoPavimento = tileTop;
+
+                    if((tile.tipo == WorldLoader.SPIKE || tile.tipo == WorldLoader.LAVA) && timer >= 2f ){
+                        player.vita -= 1;
+                        timer = 0;
                     }
-                } else if (overlapX < playerSizeX / 2f) {
-                    // Collisione laterale: trattata come "sopra"
-                    sopraQualcosa = true;
-                    if (tileTop > nuovoPavimento) {
-                        nuovoPavimento = tileTop;
-                    }
+
+                    if (tileTop > worldPavimento) worldPavimento = tileTop;
+                } else {
+                    // Player colpisce il tile dal basso (soffitto)
+                    player.playerY = tile.worldY - Player.HEIGHT;
+                    player.velY   = 0f;
+                }
+            } else {
+                // ── Collisione orizzontale: blocca il player di lato ──
+                if (overlapRight < overlapLeft) {
+                    // Player arriva da sinistra → spingi a sinistra
+                    player.playerX = tile.worldX - Player.WIDTH;
+                } else {
+                    // Player arriva da destra → spingi a destra
+                    player.playerX = tileRight;
                 }
             }
         }
 
-        pavimento = sopraQualcosa ? nuovoPavimento : WorldLoader.BASE_Y;
-
-        if (playerBounds.y < pavimento) {
-            playerBounds.y = pavimento;
-            velY = 0;
+        // Clamp al pavimento
+        float pavimento = sopraQualcosa ? worldPavimento : WorldLoader.PAVIMENTO;
+        if (player.playerY < pavimento) {
+            player.playerY = pavimento;
+            player.velY   = 0f;
         }
 
-        // ------- DISEGNO -------
+        // ── CAMERA: il player resta al centro dello schermo (X e Y) ───
+        float prevCameraX = cameraX;
+        float prevCameraY = cameraY;
+
+        cameraX = Math.max(0f, player.playerX - (xD / 2f - Player.WIDTH));
+        cameraY = Math.max(0f, player.playerY - (yD / 2f - Player.HEIGHT / 2f));
+
+        float deltaCameraX = cameraX - prevCameraX;
+        float deltaCameraY = cameraY - prevCameraY;
+
+        // ── SCROLL BACKGROUND ─────────────────────────────────────────
+        // Terreno: loop orizzontale (sia sinistra che destra)
+        float bgW = background.getWidth();
+        bgX1 -= deltaCameraX;
+        bgX2 -= deltaCameraX;
+        if (bgX1 + bgW < 0)  bgX1 = bgX2 + bgW;
+        if (bgX2 + bgW < 0)  bgX2 = bgX1 + bgW;
+        if (bgX1 > xD)       bgX1 = bgX2 - bgW;
+        if (bgX2 > xD)       bgX2 = bgX1 - bgW;
+
+        // Cielo: loop orizzontale (sia sinistra che destra)
+        float skyW = backgroundSky.getWidth();
+        skyBgX1 -= deltaCameraX;
+        skyBgX2 -= deltaCameraX;
+        if (skyBgX1 + skyW < 0)  skyBgX1 = skyBgX2 + skyW;
+        if (skyBgX2 + skyW < 0)  skyBgX2 = skyBgX1 + skyW;
+        if (skyBgX1 > xD)        skyBgX1 = skyBgX2 - skyW;
+        if (skyBgX2 > xD)        skyBgX2 = skyBgX1 - skyW;
+
+        // Posizioni Y sullo schermo
+        float bgScreenY = -cameraY;                              // terreno scende quando la camera sale
+        float skyStartY = background.getHeight() - cameraY;     // cielo inizia dove finisce il terreno
+
+        // ── DISEGNO ───────────────────────────────────────────────────
         batch.begin();
 
-        // Background
-        batch.draw(background, bgX1, 0);
-        batch.draw(background, bgX2, 0);
+        // 1. Cielo: riempie l'area sopra il background del terreno.
+        //    Looppa verticalmente se la camera è salita molto.
+        float skyH = backgroundSky.getHeight();
+        for (float skyY = skyStartY; skyY < yD; skyY += skyH) {
+            batch.draw(backgroundSky, skyBgX1, skyY);
+            batch.draw(backgroundSky, skyBgX2, skyY);
+        }
 
-        // Animazione player
-        disegnaPlayer();
+        // 2. Terreno: disegnato sopra il cielo nella zona bassa
+        if (bgScreenY + background.getHeight() > 0) {
+            batch.draw(background, bgX1, bgScreenY);
+            batch.draw(background, bgX2, bgScreenY);
+        }
 
-        // Tile del mondo
-        for (WorldLoader.WorldTile tile : worldTiles) {
-            float screenX = tile.worldX - worldOffsetX;
-            float screenY = tile.worldY;
+        // 3. Tile del mondo (world → screen tramite camera)
+        for (WorldLoader.Ostacolo tile : worldTiles) {
+            float screenX = tile.worldX - cameraX;
+            float screenY = tile.worldY - cameraY;
 
-            // Culling
-            if (screenX + tile.width < -50 || screenX > xD + 50) continue;
+            // Culling: salta tile non visibili
+            if (screenX + tile.width  < 0 || screenX > xD) continue;
+            if (screenY + tile.height < 0 || screenY > yD) continue;
 
             switch (tile.tipo) {
-                case WorldLoader.CASSA:
-                    batch.draw(cassa,  screenX, screenY, tile.width, tile.height);
-                    break;
-                case WorldLoader.LAVA:
-                    batch.draw(lava,   screenX, screenY, tile.width, tile.height);
-                    break;
-                case WorldLoader.MURO:
-                    batch.draw(muro,   screenX, screenY, tile.width, tile.height);
-                    break;
-                case WorldLoader.SPIKE:
-                    batch.draw(spike,  screenX, screenY, tile.width, tile.height);
-                    break;
-                case WorldLoader.TERRA:
-                    batch.draw(terra,  screenX, screenY, tile.width, tile.height);
-                    break;
+                case WorldLoader.CASSA: batch.draw(cassa, screenX, screenY, tile.width, tile.height); break;
+                case WorldLoader.LAVA:  batch.draw(lava,  screenX, screenY, tile.width, tile.height); break;
+                case WorldLoader.MURO:  batch.draw(muro,  screenX, screenY, tile.width, tile.height); break;
+                case WorldLoader.SPIKE: batch.draw(spike, screenX, screenY, tile.width, tile.height); break;
+                case WorldLoader.TERRA: batch.draw(terra, screenX, screenY, tile.width, tile.height); break;
+                case WorldLoader.COIN: batch.draw(coin, screenX, screenY, tile.width, tile.height); break;
             }
         }
+
+        font.draw(batch, "COIN: " + monete, Gdx.graphics.getWidth() - 180, Gdx.graphics.getHeight() - 20);
+        font.draw(batch, "VITA: " + player.vita, 20, Gdx.graphics.getHeight() - 20);
+
+        // 4. Player (conversione world → screen)
+        player.disegna(batch, player.playerX - cameraX, player.playerY - cameraY);
 
         batch.end();
-    }
-
-    private void disegnaPlayer() {
-        if (!movimentoAvanti && !movimentoIndietro) {
-            batch.draw(player, playerBounds.x, playerBounds.y);
-            movimentoSprite = 0;
-        } else if (movimentoAvanti) {
-            if (movimentoSprite <= 1) {
-                batch.draw(playerMovimento1, playerBounds.x, playerBounds.y);
-            } else if ((movimentoSprite > 1 && movimentoSprite <= 2) ||
-                       (movimentoSprite > 3 && movimentoSprite <= 4)) {
-                batch.draw(player, playerBounds.x, playerBounds.y);
-            } else if (movimentoSprite > 2 && movimentoSprite <= 3) {
-                batch.draw(playerMovimento2, playerBounds.x, playerBounds.y);
-            } else {
-                movimentoSprite = 0;
-                batch.draw(player, playerBounds.x, playerBounds.y);
-            }
-        } else {
-            if (movimentoSprite <= 1) {
-                batch.draw(playerIndietro1, playerBounds.x, playerBounds.y);
-            } else if ((movimentoSprite > 1 && movimentoSprite <= 2) ||
-                       (movimentoSprite > 3 && movimentoSprite <= 4)) {
-                batch.draw(playerIndietro, playerBounds.x, playerBounds.y);
-            } else if (movimentoSprite > 2 && movimentoSprite <= 3) {
-                batch.draw(playerIndietro2, playerBounds.x, playerBounds.y);
-            } else {
-                movimentoSprite = 0;
-                batch.draw(playerIndietro, playerBounds.x, playerBounds.y);
-            }
-        }
     }
 
     @Override
     public void dispose() {
         batch.dispose();
         background.dispose();
-        player.dispose();
-        playerMovimento1.dispose();
-        playerMovimento2.dispose();
-        playerIndietro.dispose();
-        playerIndietro1.dispose();
-        playerIndietro2.dispose();
+        backgroundSky.dispose();
         cassa.dispose();
         lava.dispose();
         muro.dispose();
         spike.dispose();
         terra.dispose();
+        coin.dispose();
+        player.dispose();
     }
 
-    public boolean collisione(float x1, float y1, float w1, float h1,
-                               float x2, float y2, float w2, float h2) {
+    private boolean collisione(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
         return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
     }
 }
