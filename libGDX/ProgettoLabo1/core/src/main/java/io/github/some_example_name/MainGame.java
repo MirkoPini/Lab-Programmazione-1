@@ -13,36 +13,28 @@ import java.util.List;
 public class MainGame extends ApplicationAdapter {
 
     private SpriteBatch batch;
-
-    // Background terreno (scorre in loop orizzontale e verticale)
     private Texture background;
     private float bgX1, bgX2;
-
     private BitmapFont font;
-
-    // Background cielo: appare sopra il terreno quando la camera sale
     private Texture backgroundSky;
     private float skyBgX1, skyBgX2;
 
-    // Camera: coordinate MONDO dell'angolo in basso a sinistra della viewport.
-    // screen = world - camera
-    private float cameraX = 0f;
-    private float cameraY = 0f;
+    private float coordinataX = 0;
+    private float coordinataY = 0;
 
-    // Texture ostacoli
-    private Texture cassa, lava, muro, terra, spike, coin;
+    private Texture cassa;
+    private Texture lava;
+    private Texture muro;
+    private Texture terra;
+    private Texture spike;
+    private Texture coin;
 
-    // Mondo caricato da file
     private WorldLoader worldLoader;
-    private List<WorldLoader.Ostacolo> worldTiles;
+    private List<WorldLoader.Ostacolo> Ostacoli;
 
-    // Player
     private Player player;
-
     private int monete;
-    private int vita = 3;
-
-    private float timer = 0f;
+    private float timer = 0;
 
     @Override
     public void create() {
@@ -51,9 +43,9 @@ public class MainGame extends ApplicationAdapter {
         background    = new Texture("background.jpg");
         backgroundSky = new Texture("background_sky.png");
 
-        bgX1    = 0f;
-        bgX2    = background.getWidth();
-        skyBgX1 = 0f;
+        bgX1 = 0;
+        bgX2 = background.getWidth();
+        skyBgX1 = 0;
         skyBgX2 = backgroundSky.getWidth();
 
         cassa = new Texture("ostacoli/cassa.png");
@@ -64,16 +56,15 @@ public class MainGame extends ApplicationAdapter {
         coin = new Texture("ostacoli/coin.png");
 
         worldLoader = new WorldLoader("world.txt");
-        worldTiles  = worldLoader.getOstacoloNonAria();
+        Ostacoli = worldLoader.getOstacoloNonAria();
 
-        // Player parte al centro schermo (posizione mondo = posizione schermo quando cameraX=0)
         float xD = Gdx.graphics.getWidth();
-        player = new Player(0f, WorldLoader.PAVIMENTO);
+        player = new Player(0, WorldLoader.PAVIMENTO);
         player.texturePlayer();
 
         font = new BitmapFont();
         font.setColor(Color.YELLOW);
-        font.getData().setScale(3f);
+        font.getData().setScale(3);
     }
 
     @Override
@@ -84,147 +75,150 @@ public class MainGame extends ApplicationAdapter {
         float yD = Gdx.graphics.getHeight();
         float dt = Gdx.graphics.getDeltaTime();
 
-        // ── AGGIORNAMENTO PLAYER (input + fisica) ─────────────────────
         player.movimento(dt);
 
         timer += dt;
 
-        // ── COLLISIONI CON I TILE IN COORDINATE MONDO ─────────────────
         float worldPavimento  = WorldLoader.PAVIMENTO;
         boolean sopraQualcosa = false;
 
-        for (WorldLoader.Ostacolo tile : worldTiles) {
-            if (!collisione(player.playerX, player.playerY, Player.WIDTH, Player.HEIGHT, tile.worldX,  tile.worldY,   tile.width,   tile.height)) continue;
+        for (WorldLoader.Ostacolo obs : Ostacoli) {
+            if (!collisione(player.playerX, player.playerY, Player.WIDTH, Player.HEIGHT, obs.worldX,  obs.worldY,   obs.width,   obs.height)){
+                continue;
+            }
 
-            float tileTop    = tile.worldY + tile.height;
-            float tileRight  = tile.worldX + tile.width;
+            float obsTop = obs.worldY + obs.height;
+            float obsRight = obs.worldX + obs.width;
 
-            // Calcola l'overlap su ogni lato
-            float overlapTop    = tileTop                       - player.playerY;          // player entra dal basso
-            float overlapBottom = (player.playerY + Player.HEIGHT) - tile.worldY;          // player scende dall'alto
-            float overlapLeft   = tileRight                     - player.playerX;          // player viene da destra
-            float overlapRight  = (player.playerX + Player.WIDTH) - tile.worldX;          // player viene da sinistra
+            //Generato da AI
+            float overlapTop = obsTop - player.playerY;
+            float overlapBottom = (player.playerY + Player.HEIGHT) - obs.worldY;
+            float overlapLeft = obsRight - player.playerX;
+            float overlapRight = (player.playerX + Player.WIDTH) - obs.worldX;
 
             float minOverlapY = Math.min(overlapTop, overlapBottom);
             float minOverlapX = Math.min(overlapLeft, overlapRight);
+            //Fino a qui
 
-            if(tile.tipo == WorldLoader.COIN){
-                tile.worldX = -9999f;
-                tile.worldY = -9999f;
+            if(obs.tipo == WorldLoader.COIN){
+                obs.worldX = -9999f;
+                obs.worldY = -9999f;
                 monete += 1;
                 continue;
             }
 
             if (minOverlapY < minOverlapX) {
-                // ── Collisione verticale ──────────────────────────────
                 if (overlapTop < overlapBottom) {
-                    // Player atterra sopra il tile (cade dall'alto)
                     sopraQualcosa = true;
 
-                    if((tile.tipo == WorldLoader.SPIKE || tile.tipo == WorldLoader.LAVA) && timer >= 2f ){
+                    if((obs.tipo == WorldLoader.SPIKE || obs.tipo == WorldLoader.LAVA) && timer >= 2f ){
                         player.vita -= 1;
                         timer = 0;
                     }
-
-                    if (tileTop > worldPavimento) worldPavimento = tileTop;
+                    if (obsTop > worldPavimento) worldPavimento = obsTop;
                 } else {
-                    // Player colpisce il tile dal basso (soffitto)
-                    player.playerY = tile.worldY - Player.HEIGHT;
+                    player.playerY = obs.worldY - Player.HEIGHT;
                     player.velY   = 0f;
                 }
             } else {
-                // ── Collisione orizzontale: blocca il player di lato ──
                 if (overlapRight < overlapLeft) {
-                    // Player arriva da sinistra → spingi a sinistra
-                    player.playerX = tile.worldX - Player.WIDTH;
+                    player.playerX = obs.worldX - Player.WIDTH;
                 } else {
-                    // Player arriva da destra → spingi a destra
-                    player.playerX = tileRight;
+                    player.playerX = obsRight;
                 }
             }
         }
 
-        // Clamp al pavimento
         float pavimento = sopraQualcosa ? worldPavimento : WorldLoader.PAVIMENTO;
         if (player.playerY < pavimento) {
             player.playerY = pavimento;
             player.velY   = 0f;
         }
 
-        // ── CAMERA: il player resta al centro dello schermo (X e Y) ───
-        float prevCameraX = cameraX;
-        float prevCameraY = cameraY;
+        float prevCoordX = coordinataX;
+        float prevCoordY = coordinataY;
 
-        cameraX = Math.max(0f, player.playerX - (xD / 2f - Player.WIDTH));
-        cameraY = Math.max(0f, player.playerY - (yD / 2f - Player.HEIGHT / 2f));
+        coordinataX = Math.max(0f, player.playerX - (xD / 2f - Player.WIDTH));
+        coordinataY = Math.max(0f, player.playerY - (yD / 2f - Player.HEIGHT / 2f));
 
-        float deltaCameraX = cameraX - prevCameraX;
-        float deltaCameraY = cameraY - prevCameraY;
+        float deltaCoordX = coordinataX - prevCoordX;
+        float deltaCoordY = coordinataY - prevCoordY;
 
-        // ── SCROLL BACKGROUND ─────────────────────────────────────────
-        // Terreno: loop orizzontale (sia sinistra che destra)
+
         float bgW = background.getWidth();
-        bgX1 -= deltaCameraX;
-        bgX2 -= deltaCameraX;
-        if (bgX1 + bgW < 0)  bgX1 = bgX2 + bgW;
-        if (bgX2 + bgW < 0)  bgX2 = bgX1 + bgW;
-        if (bgX1 > xD)       bgX1 = bgX2 - bgW;
-        if (bgX2 > xD)       bgX2 = bgX1 - bgW;
+        bgX1 -= deltaCoordX;
+        bgX2 -= deltaCoordX;
 
-        // Cielo: loop orizzontale (sia sinistra che destra)
+        if (bgX1 + bgW < 0) {
+            bgX1 = bgX2 + bgW;
+        }
+        if (bgX2 + bgW < 0) {
+            bgX2 = bgX1 + bgW;
+        }
+        if (bgX1 > xD) {
+            bgX1 = bgX2 - bgW;
+        }
+        if (bgX2 > xD) {
+            bgX2 = bgX1 - bgW;
+        }
+
+
         float skyW = backgroundSky.getWidth();
-        skyBgX1 -= deltaCameraX;
-        skyBgX2 -= deltaCameraX;
-        if (skyBgX1 + skyW < 0)  skyBgX1 = skyBgX2 + skyW;
-        if (skyBgX2 + skyW < 0)  skyBgX2 = skyBgX1 + skyW;
-        if (skyBgX1 > xD)        skyBgX1 = skyBgX2 - skyW;
-        if (skyBgX2 > xD)        skyBgX2 = skyBgX1 - skyW;
+        skyBgX1 -= deltaCoordX;
+        skyBgX2 -= deltaCoordX;
 
-        // Posizioni Y sullo schermo
-        float bgScreenY = -cameraY;                              // terreno scende quando la camera sale
-        float skyStartY = background.getHeight() - cameraY;     // cielo inizia dove finisce il terreno
+        if (skyBgX1 + skyW < 0) {
+            skyBgX1 = skyBgX2 + skyW;
+        }
+        if (skyBgX2 + skyW < 0) {
+            skyBgX2 = skyBgX1 + skyW;
+        }
+        if (skyBgX1 > xD) {
+            skyBgX1 = skyBgX2 - skyW;
+        }
+        if (skyBgX2 > xD) {
+            skyBgX2 = skyBgX1 - skyW;
+        }
 
-        // ── DISEGNO ───────────────────────────────────────────────────
+        float bgScreenY = -coordinataY;
+        float skyStartY = background.getHeight() - coordinataY;
+
         batch.begin();
 
-        // 1. Cielo: riempie l'area sopra il background del terreno.
-        //    Looppa verticalmente se la camera è salita molto.
+
         float skyH = backgroundSky.getHeight();
+
         for (float skyY = skyStartY; skyY < yD; skyY += skyH) {
             batch.draw(backgroundSky, skyBgX1, skyY);
             batch.draw(backgroundSky, skyBgX2, skyY);
         }
 
-        // 2. Terreno: disegnato sopra il cielo nella zona bassa
         if (bgScreenY + background.getHeight() > 0) {
             batch.draw(background, bgX1, bgScreenY);
             batch.draw(background, bgX2, bgScreenY);
         }
 
-        // 3. Tile del mondo (world → screen tramite camera)
-        for (WorldLoader.Ostacolo tile : worldTiles) {
-            float screenX = tile.worldX - cameraX;
-            float screenY = tile.worldY - cameraY;
+        for (WorldLoader.Ostacolo obs : Ostacoli) {
+            float screenX = obs.worldX - coordinataX;
+            float screenY = obs.worldY - coordinataY;
 
-            // Culling: salta tile non visibili
-            if (screenX + tile.width  < 0 || screenX > xD) continue;
-            if (screenY + tile.height < 0 || screenY > yD) continue;
+            if (screenX + obs.width  < 0 || screenX > xD) continue;
+            if (screenY + obs.height < 0 || screenY > yD) continue;
 
-            switch (tile.tipo) {
-                case WorldLoader.CASSA: batch.draw(cassa, screenX, screenY, tile.width, tile.height); break;
-                case WorldLoader.LAVA:  batch.draw(lava,  screenX, screenY, tile.width, tile.height); break;
-                case WorldLoader.MURO:  batch.draw(muro,  screenX, screenY, tile.width, tile.height); break;
-                case WorldLoader.SPIKE: batch.draw(spike, screenX, screenY, tile.width, tile.height); break;
-                case WorldLoader.TERRA: batch.draw(terra, screenX, screenY, tile.width, tile.height); break;
-                case WorldLoader.COIN: batch.draw(coin, screenX, screenY, tile.width, tile.height); break;
+            switch (obs.tipo) {
+                case WorldLoader.CASSA: batch.draw(cassa, screenX, screenY, obs.width, obs.height); break;
+                case WorldLoader.LAVA:  batch.draw(lava,  screenX, screenY, obs.width, obs.height); break;
+                case WorldLoader.MURO:  batch.draw(muro,  screenX, screenY, obs.width, obs.height); break;
+                case WorldLoader.SPIKE: batch.draw(spike, screenX, screenY, obs.width, obs.height); break;
+                case WorldLoader.TERRA: batch.draw(terra, screenX, screenY, obs.width, obs.height); break;
+                case WorldLoader.COIN: batch.draw(coin, screenX, screenY, obs.width, obs.height); break;
             }
         }
 
         font.draw(batch, "COIN: " + monete, Gdx.graphics.getWidth() - 180, Gdx.graphics.getHeight() - 20);
         font.draw(batch, "VITA: " + player.vita, 20, Gdx.graphics.getHeight() - 20);
 
-        // 4. Player (conversione world → screen)
-        player.disegna(batch, player.playerX - cameraX, player.playerY - cameraY);
+        player.disegna(batch, player.playerX - coordinataX, player.playerY - coordinataY);
 
         batch.end();
     }
@@ -243,6 +237,7 @@ public class MainGame extends ApplicationAdapter {
         player.dispose();
     }
 
+    //Generata con AI
     private boolean collisione(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
         return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
     }

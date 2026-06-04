@@ -114,8 +114,8 @@ public class WorldLoader {
 
 
     public static class Ostacolo {
-        public final int tipo;   // CASSA, LAVA, MURO, SPIKE, TERRA
-        public float worldX;     // X nel mondo (non nella schermata)
+        public final int tipo;
+        public float worldX;
         public float worldY;
         public final float width;
         public final float height;
