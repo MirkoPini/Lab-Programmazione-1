@@ -2,6 +2,7 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class WorldLoader {
     public static final int SPIKE = 4;
     public static final int TERRA = 5;
     public static final int COIN = 6;
+    public static final int DOOR = 7;
 
     private int[][] griglia_mappa;
 
@@ -32,41 +34,46 @@ public class WorldLoader {
     }
 
     private void caricaMappa(String nomeFile) {
-        FileHandle file = Gdx.files.internal(nomeFile);
-        String contenuto = file.readString();
+        try {
+            FileHandle file = Gdx.files.internal(nomeFile);
+            String contenuto = file.readString();
 
-        String[] linee = contenuto.split("\\r?\\n");
-        List<String> righeValide = new ArrayList<>();
+            String[] linee = contenuto.split("\\r?\\n");
+            List<String> righeValide = new ArrayList<>();
 
-        for (String linea : linee) {
-            if (!linea.trim().isEmpty()) {
-                righeValide.add(linea);
-            }
-        }
-
-        righe = righeValide.size();
-        colonne = 0;
-        for (String linea : righeValide) {
-            if (linea.length() > colonne){
-                colonne = linea.length();
-            }
-        }
-
-        griglia_mappa = new int[righe][colonne];
-
-        //Ciclo generato da AI
-        for (int r = 0; r < righe; r++) {
-            String linea = righeValide.get(r);
-            for (int c = 0; c < colonne; c++) {
-                if (c < linea.length()) {
-                    char ch = linea.charAt(c);
-                    int valore = Character.getNumericValue(ch);
-                    griglia_mappa[r][c] = (valore >= ARIA && valore <= COIN) ? valore : ARIA;
-                } else {
-                    griglia_mappa[r][c] = ARIA;
+            for (String linea : linee) {
+                if (!linea.trim().isEmpty()) {
+                    righeValide.add(linea);
                 }
             }
+
+            righe = righeValide.size();
+            colonne = 0;
+            for (String linea : righeValide) {
+                if (linea.length() > colonne) {
+                    colonne = linea.length();
+                }
+            }
+
+            griglia_mappa = new int[righe][colonne];
+
+            //Ciclo generato da AI
+            for (int r = 0; r < righe; r++) {
+                String linea = righeValide.get(r);
+                for (int c = 0; c < colonne; c++) {
+                    if (c < linea.length()) {
+                        char ch = linea.charAt(c);
+                        int valore = Character.getNumericValue(ch);
+                        griglia_mappa[r][c] = (valore >= ARIA && valore <= DOOR) ? valore : ARIA;
+                    } else {
+                        griglia_mappa[r][c] = ARIA;
+                    }
+                }
+            }
+        }catch (GdxRuntimeException e){
+            System.out.println("Impossibile leggere il file");
         }
+
     }
 
     public int getOstacolo(int riga, int colonna) {

@@ -6,19 +6,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
-public class Player {
+public class Player extends Entita{
 
     public static final float WIDTH = 160;
     public static final float HEIGHT = 185;
     public static final float SPEED = 400;
     public static final float GRAVITY = -2000;
-    public static final float JUMP_FORCE = 900;
-
-
-    public float playerX;
-    public float playerY;
-    public float velY = 0;
-    public int vita = 3;
+    public static final float JUMP_FORCE = 900;;
 
     private boolean avanti = false;
     private boolean indietro = false;
@@ -33,8 +27,7 @@ public class Player {
 
 
     public Player(float startPlayerX, float startPlayerY) {
-        this.playerX = startPlayerX;
-        this.playerY = startPlayerY;
+        super(startPlayerX, startPlayerY, 3);
     }
 
     public void texturePlayer() {
@@ -46,6 +39,7 @@ public class Player {
         movimentooIndietro2 = new Texture("player/playerIndietro2.png");
     }
 
+    @Override
     public void movimento(float dt) {
         avanti = false;
         indietro = false;
@@ -70,7 +64,7 @@ public class Player {
             timerAnimazione = 0;
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && velY > -50 && velY < 50) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && velY == 0) {
             velY = JUMP_FORCE;
         }
 
@@ -78,6 +72,7 @@ public class Player {
         playerY += velY    * dt;
     }
 
+    @Override
     public void disegna(SpriteBatch batch, float screenX, float screenY) {
         if (!avanti && !indietro) {
             batch.draw(fermo, screenX, screenY);
@@ -109,6 +104,7 @@ public class Player {
         }
     }
 
+    @Override
     public void dispose() {
         fermo.dispose();
         movimentoAvanti1.dispose();
