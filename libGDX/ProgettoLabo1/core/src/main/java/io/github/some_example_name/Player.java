@@ -2,6 +2,7 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -17,6 +18,11 @@ public class Player extends Entita{
     private boolean avanti = false;
     private boolean indietro = false;
     private float timerAnimazione = 0;
+    private Sound footSound;
+    private Sound footSound1;
+    private boolean suonoCamminata;
+    private boolean suonoCamminata1 = true;
+    private Sound jumpSound;
 
     private Texture fermo;
     private Texture movimentoAvanti1;
@@ -28,6 +34,9 @@ public class Player extends Entita{
 
     public Player(float startPlayerX, float startPlayerY) {
         super(startPlayerX, startPlayerY, 3);
+        footSound = Gdx.audio.newSound(Gdx.files.internal("sfx/footstep.mp3"));
+        footSound1 = Gdx.audio.newSound(Gdx.files.internal("sfx/footstep1.mp3"));
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.mp3"));
     }
 
     public void texturePlayer() {
@@ -59,13 +68,17 @@ public class Player extends Entita{
 
         if (avanti || indietro) {
             timerAnimazione += 10 * dt;
-            if (timerAnimazione > 4) timerAnimazione = 0;
+            if (timerAnimazione > 4) {
+                timerAnimazione = 0;
+                suonoCamminata = true;
+            }
         } else {
             timerAnimazione = 0;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && velY == 0) {
             velY = JUMP_FORCE;
+            long jumpId = jumpSound.play();
         }
 
         velY   += GRAVITY * dt;
@@ -93,14 +106,26 @@ public class Player extends Entita{
             frame2 = movimentooIndietro2;
         }
 
-        if (timerAnimazione <= 1f) {
+        if (timerAnimazione <= 1) {
             batch.draw(frame1, screenX, screenY);
-        } else if (timerAnimazione <= 2f) {
+        } else if (timerAnimazione <= 2) {
             batch.draw(frameI, screenX, screenY);
-        } else if (timerAnimazione <= 3f) {
+        } else if (timerAnimazione <= 3) {
             batch.draw(frame2, screenX, screenY);
         } else {
             batch.draw(frameI, screenX, screenY);
+        }
+
+        if(suonoCamminata){
+            if(suonoCamminata1) {
+                long footId = footSound.play();
+                suonoCamminata = false;
+                suonoCamminata1 = false;
+            } else{
+                long foot1Id = footSound1.play();
+                suonoCamminata = false;
+                suonoCamminata1 = true;
+            }
         }
     }
 
@@ -112,6 +137,7 @@ public class Player extends Entita{
         fermoIndietro.dispose();
         movimentoIndietro1.dispose();
         movimentooIndietro2.dispose();
+        footSound.dispose();
     }
 
 

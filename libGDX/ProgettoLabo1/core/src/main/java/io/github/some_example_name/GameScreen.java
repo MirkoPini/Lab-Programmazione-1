@@ -2,6 +2,7 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -10,12 +11,21 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.List;
 
+/**
+ * Classe principale che gestisce la parte pricipale del gioco
+ *
+ * @author Mirko Pini
+ * @version Giugnio 2026
+ */
+
 public class GameScreen implements Screen {
 
     private SpriteBatch batch;
     private Texture background;
     private float bgX1, bgX2;
     private BitmapFont font;
+    private BitmapFont gameOver;
+    private BitmapFont gameCompleted;
     private Texture backgroundSky;
     private float skyBgX1, skyBgX2;
 
@@ -28,6 +38,7 @@ public class GameScreen implements Screen {
     private Texture terra;
     private Texture spike;
     private Texture coin;
+    private Texture door;
 
     private WorldLoader worldLoader;
     private List<WorldLoader.Ostacolo> Ostacoli;
@@ -38,7 +49,18 @@ public class GameScreen implements Screen {
     private Player player;
     private int monete;
     private float timer = 0;
+    private float stopGameTimer = 0;
 
+    private boolean levelcompleted;
+
+    private Sound coinSound;
+    private Sound gameOverSound;
+    private Sound damageSound;
+    private Sound gameCompletedSound;
+
+    /**
+     * Istanzia tutti gli elementi necessari per il gioco
+     */
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -57,6 +79,7 @@ public class GameScreen implements Screen {
         terra = new Texture("ostacoli/terra.png");
         spike = new Texture("ostacoli/spike.png");
         coin = new Texture("ostacoli/coin.png");
+        door = new Texture("ostacoli/door.png");
 
         worldLoader = new WorldLoader("world" + livello + ".txt");
         Ostacoli = worldLoader.getOstacoloNonAria();
@@ -68,7 +91,27 @@ public class GameScreen implements Screen {
         font = new BitmapFont();
         font.setColor(Color.YELLOW);
         font.getData().setScale(3);
+
+        gameOver = new BitmapFont();
+        gameOver.setColor(Color.RED);
+        gameOver.getData().setScale(10);
+
+        gameCompleted = new BitmapFont();
+        gameCompleted.setColor(Color.GREEN);
+        gameCompleted.getData().setScale(10);
+
+        coinSound = Gdx.audio.newSound(Gdx.files.internal("sfx/coin.wav"));
+        gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sfx/gameOver.wav"));
+        damageSound = Gdx.audio.newSound(Gdx.files.internal("sfx/damage.mp3"));
+        gameCompletedSound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelCompleted.mp3"));
     }
+
+    /**
+     *
+     * Ciclo che per mette il funzionamento del gioco
+     *
+     * @param dt Delta che permette la fluidità del gioco a diversi frame rate
+     */
 
     @Override
     public void render(float dt) {
@@ -86,7 +129,7 @@ public class GameScreen implements Screen {
         boolean sopraQualcosa = false;
 
         for (WorldLoader.Ostacolo obs : Ostacoli) {
-            if (!collisione(player.playerX, player.playerY, Player.WIDTH, Player.HEIGHT, obs.worldX,  obs.worldY,   obs.width,   obs.height)){
+            if (!Collision.collisione(player.playerX, player.playerY, Player.WIDTH, Player.HEIGHT, obs.worldX,  obs.worldY,   obs.width,   obs.height)){
                 continue;
             }
 
@@ -107,7 +150,12 @@ public class GameScreen implements Screen {
                 obs.worldX = -9999f;
                 obs.worldY = -9999f;
                 monete += 1;
+                long coinId = coinSound.play();
                 continue;
+            }
+
+            if(obs.tipo == WorldLoader.DOOR){
+                levelcompleted = true;
             }
 
             if (minOverlapY < minOverlapX) {
@@ -116,6 +164,7 @@ public class GameScreen implements Screen {
 
                     if((obs.tipo == WorldLoader.SPIKE || obs.tipo == WorldLoader.LAVA) && timer >= 2f ){
                         player.vita -= 1;
+                        long damageId = damageSound.play();
                         timer = 0;
                     }
                     if (obsTop > worldPavimento) worldPavimento = obsTop;
@@ -215,6 +264,7 @@ public class GameScreen implements Screen {
                 case WorldLoader.SPIKE: batch.draw(spike, screenX, screenY, obs.width, obs.height); break;
                 case WorldLoader.TERRA: batch.draw(terra, screenX, screenY, obs.width, obs.height); break;
                 case WorldLoader.COIN: batch.draw(coin, screenX, screenY, obs.width, obs.height); break;
+                case WorldLoader.DOOR: batch.draw(door, screenX, screenY, obs.width, obs.height); break;
             }
         }
 
@@ -222,6 +272,26 @@ public class GameScreen implements Screen {
         font.draw(batch, "VITE: " + player.vita + "/3", 20, Gdx.graphics.getHeight() - 20);
 
         player.disegna(batch, player.playerX - coordinataX, player.playerY - coordinataY);
+
+        if(player.vita <= 0){
+            if(stopGameTimer == 0){
+                long gameOverId = gameOverSound.play();
+            }
+            gameOver.draw(batch, "GAME OVER", Gdx.graphics.getWidth()/2 - 400, Gdx.graphics.getHeight()/2 + 50);
+            stopGameTimer += dt;
+        }
+
+        if(levelcompleted && player.vita > 0){
+            if(stopGameTimer == 0){
+                long gameCompletedId = gameCompletedSound.play();
+            }
+            gameOver.draw(batch, "COMPLETED", Gdx.graphics.getWidth()/2 - 400, Gdx.graphics.getHeight()/2 + 50);
+            stopGameTimer += dt;
+        }
+
+        if(stopGameTimer >= 3){
+            game.setScreen(new MenuScreen(game));
+        }
 
         batch.end();
     }
@@ -258,11 +328,6 @@ public class GameScreen implements Screen {
         terra.dispose();
         coin.dispose();
         player.dispose();
-    }
-
-    //Generata con AI
-    private boolean collisione(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
-        return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
     }
 
     public GameScreen(MainGame game, int livello) {

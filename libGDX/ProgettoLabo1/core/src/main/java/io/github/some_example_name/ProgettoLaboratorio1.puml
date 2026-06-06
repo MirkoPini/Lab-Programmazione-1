@@ -1,0 +1,90 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+interface Disegnabile {
+  +disegna(batch: SpriteBatch, screenX: float, screenY: float): void
+  +dispose(): void
+}
+
+abstract class Entita implements Disegnabile {
+  +playerX: float
+  +playerY: float
+  +velY: float
+  +vita: int
+  +Entita(x: float, y: float, vita: int)
+  +movimento(dt: float): void
+}
+
+class Player extends Entita {
+  +WIDTH: float
+  +HEIGHT: float
+  +SPEED: float
+  +GRAVITY: float
+  +JUMP_FORCE: float
+  -avanti: boolean
+  -indietro: boolean
+  -timerAnimazione: float
+  +Player(startPlayerX: float, startPlayerY: float)
+  +texturePlayer(): void
+  +movimento(dt: float): void
+  +disegna(batch: SpriteBatch, screenX: float, screenY: float): void
+  +dispose(): void
+  +isAvanti(): boolean
+  +isIndietro(): boolean
+}
+
+class WorldLoader {
+  +PAVIMENTO: float
+  +CASSA: int
+  +LAVA: int
+  +MURO: int
+  +SPIKE: int
+  +TERRA: int
+  +COIN: int
+  +DOOR: int
+  -griglia_mappa: int[][]
+  -righe: int
+  -colonne: int
+  +WorldLoader(nomeFile: String)
+  -caricaMappa(nomeFile: String): void
+  +getOstacolo(riga: int, colonna: int): int
+  +getWorldX(colonna: int): float
+  +getWorldY(riga: int): float
+  +getLarghezzaMondo(): float
+  +getColonne(): int
+  +getRighe(): int
+  +getOstacoloNonAria(): List~Ostacolo~
+}
+
+class Ostacolo {
+  +tipo: int
+  +worldX: float
+  +worldY: float
+  +width: float
+  +height: float
+  +Ostacolo(tipo: int, worldX: float, worldY: float, width: float, height: float)
+}
+
+
+
+class GameScreen {
+  -player: Player
+  -worldLoader: WorldLoader
+  -Ostacoli: List~Ostacolo~
+  -coordinataX: float
+  -coordinataY: float
+  -monete: int
+  -livello: int
+  -levelcompleted: boolean
+  +GameScreen(game: MainGame, livello: int)
+  +show(): void
+  +render(dt: float): void
+  +dispose(): void
+  -collisione(x1, y1, w1, h1, x2, y2, w2, h2): boolean
+}
+
+GameScreen "1" o-- "1" Player
+GameScreen "1" o-- "1" WorldLoader
+WorldLoader "1" *-- "*" Ostacolo
+
+@enduml
