@@ -65,7 +65,7 @@ public class GameScreen implements Screen {
     public void show() {
         batch = new SpriteBatch();
 
-        background    = new Texture("background.jpg");
+        background = new Texture("background.jpg");
         backgroundSky = new Texture("background_sky.png");
 
         bgX1 = 0;
@@ -74,8 +74,8 @@ public class GameScreen implements Screen {
         skyBgX2 = backgroundSky.getWidth();
 
         cassa = new Texture("ostacoli/cassa.png");
-        lava  = new Texture("ostacoli/lava.png");
-        muro  = new Texture("ostacoli/muro.png");
+        lava = new Texture("ostacoli/lava.png");
+        muro = new Texture("ostacoli/muro.png");
         terra = new Texture("ostacoli/terra.png");
         spike = new Texture("ostacoli/spike.png");
         coin = new Texture("ostacoli/coin.png");
